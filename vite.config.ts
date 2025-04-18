@@ -1,9 +1,10 @@
+import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import path from 'path';
-import tailwindcss from "@tailwindcss/vite";
 import { resolve } from 'node:path';
+import path from 'path';
 import { defineConfig } from 'vite';
+import vuetify from 'vite-plugin-vuetify';
 
 export default defineConfig({
     plugins: [
@@ -21,6 +22,7 @@ export default defineConfig({
                 },
             },
         }),
+        vuetify({ autoImport: true, styles: { configFile: 'config/settings.scss' } }),
     ],
     resolve: {
         alias: {
