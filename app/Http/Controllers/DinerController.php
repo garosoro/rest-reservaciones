@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\DinerResource;
 use App\Models\Diner;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,10 +15,13 @@ class DinerController extends Controller
      */
     public function index()
     {
-        //
-        // dd(DinerResource::collection(Diner::all()));
+        // Obtener Diners y ordenarlos por created_at DESC
+        $diners = Diner::select('id', 'name', 'email')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return Inertia::render('comensales/index', [
-            'diners' => DinerResource::collection(Diner::all()),
+            'diners' => DinerResource::collection($diners),
         ]);
     }
 
@@ -27,8 +31,6 @@ class DinerController extends Controller
     public function create()
     {
         //
-        return Inertia::render('diners/create');
-
     }
 
     /**
@@ -37,12 +39,22 @@ class DinerController extends Controller
     public function store(Request $request)
     {
         //
-        Diner::create([
-            'title' => $request->title,
-            'content' => $request->content,
-        ]);
+        try {
+            //Validacion de comensal
+            $validated = $request->validate([
+                'name' => 'required|string|min:3',
+                'email' => 'required|email',
+                'telephone' => 'required|digits:9',
+                'address' => 'required|string|min:5',
+            ]);
 
-        return redirect()->route('diners.index');
+            Diner::create($validated);
+            // dd($inserted);
+            return redirect()->route('comensales.index')->with('success', 'Diner created successfully');
+        } catch (Exception $e) {
+            dd($e);
+
+        }
     }
 
     /**
@@ -56,39 +68,48 @@ class DinerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Diner $diner)
+    public function edit(Diner $comensale)
     {
-        //
-        $post = Diner::findOrFail($diner);
-        return Inertia::render('diners/edit', [
-            'post' => $post,
-        ]);
+        try {
+            // Return only the specific diner data for partial reload
+            return response()->json([
+                'success' => true,
+                'diner' => $comensale,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener el comensal',
+            ], 500);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Diner $diner)
+    public function update(Request $request, Diner $comensale)
     {
         //
-        $post = Diner::findOrFail($diner);
-        $post->update([
-            'title' => $request->title,
-            'content' => $request->content,
+        $validated = $request->validate([
+            'name' => 'required|string|min:3',
+            'email' => 'required|email',
+            'telephone' => 'required|digits:9',
+            'address' => 'required|string|min:5',
         ]);
 
-        return redirect()->route('diners.index');
+        $comensale->update($validated);
+
+        return redirect()->route('comensales.index')->with('success', 'Diner updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Diner $diner)
+    public function destroy(Diner $comensale)
     {
         //
-        $post = Diner::findOrFail($diner);
-        $post->delete();
+        $comensale->delete();
 
-        return redirect()->route('diners.index');
+        return redirect()->route('comensales.index')->with('success', 'Diner deleted successfully');
     }
 }

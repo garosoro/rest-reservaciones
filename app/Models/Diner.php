@@ -9,4 +9,11 @@ class Diner extends Model
 {
     /** @use HasFactory<\Database\Factories\DinerFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'telephone',
+        'address',
+    ];
 }
