@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\DinerResource;
 use App\Models\Diner;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DinerController extends Controller
 {
@@ -13,6 +15,10 @@ class DinerController extends Controller
     public function index()
     {
         //
+        // dd(DinerResource::collection(Diner::all()));
+        return Inertia::render('comensales/index', [
+            'diners' => DinerResource::collection(Diner::all()),
+        ]);
     }
 
     /**
@@ -21,6 +27,8 @@ class DinerController extends Controller
     public function create()
     {
         //
+        return Inertia::render('diners/create');
+
     }
 
     /**
@@ -29,6 +37,12 @@ class DinerController extends Controller
     public function store(Request $request)
     {
         //
+        Diner::create([
+            'title' => $request->title,
+            'content' => $request->content,
+        ]);
+
+        return redirect()->route('diners.index');
     }
 
     /**
@@ -45,6 +59,10 @@ class DinerController extends Controller
     public function edit(Diner $diner)
     {
         //
+        $post = Diner::findOrFail($diner);
+        return Inertia::render('diners/edit', [
+            'post' => $post,
+        ]);
     }
 
     /**
@@ -53,6 +71,13 @@ class DinerController extends Controller
     public function update(Request $request, Diner $diner)
     {
         //
+        $post = Diner::findOrFail($diner);
+        $post->update([
+            'title' => $request->title,
+            'content' => $request->content,
+        ]);
+
+        return redirect()->route('diners.index');
     }
 
     /**
@@ -61,5 +86,9 @@ class DinerController extends Controller
     public function destroy(Diner $diner)
     {
         //
+        $post = Diner::findOrFail($diner);
+        $post->delete();
+
+        return redirect()->route('diners.index');
     }
 }

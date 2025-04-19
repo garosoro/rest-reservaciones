@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Diner;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,5 +14,6 @@ class DinerSeeder extends Seeder
     public function run(): void
     {
         //
+        Diner::factory()->count(10)->create();
     }
 }
