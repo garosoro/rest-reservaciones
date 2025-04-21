@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\DinerController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TableController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,6 +19,8 @@ Route::get('dashboard', function () {
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
 
-Route::resource('comensales', DinerController::class);
-Route::resource('mesas', TableController::class);
-Route::resource('reservas', ReservationController::class);
+Route::resource('diners', DinerController::class);
+Route::resource('tables', TableController::class);
+Route::resource('reservations', ReservationController::class);
+Route::get('search', [SearchController::class, 'search'])->name('reservations.search');
+Route::get('/tablesAvailabes', [SearchController::class, 'tablesAvailables'])->name('tables.availables');

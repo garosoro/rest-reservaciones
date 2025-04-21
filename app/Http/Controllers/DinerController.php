@@ -15,9 +15,8 @@ class DinerController extends Controller
      */
     public function index()
     {
-        // Obtener Diners y ordenarlos por created_at DESC
-        $diners = Diner::select('id', 'name', 'email')
-            ->orderBy('created_at', 'desc')
+        // Obtener Diners y ordenarlos por created_at DESC usando laravel Resources
+        $diners = Diner::orderBy('created_at', 'desc')
             ->get();
 
         return Inertia::render('comensales/index', [
@@ -50,7 +49,7 @@ class DinerController extends Controller
 
             Diner::create($validated);
             // dd($inserted);
-            return redirect()->route('comensales.index')->with('success', 'Diner created successfully');
+            return redirect()->route('diners.index')->with('success', 'Diner created successfully');
         } catch (Exception $e) {
             dd($e);
 
@@ -68,13 +67,13 @@ class DinerController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Diner $comensale)
+    public function edit(Diner $diner)
     {
         try {
             // Return only the specific diner data for partial reload
             return response()->json([
                 'success' => true,
-                'diner' => $comensale,
+                'diner' => $diner,
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -87,7 +86,7 @@ class DinerController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Diner $comensale)
+    public function update(Request $request, Diner $diner)
     {
         //
         $validated = $request->validate([
@@ -97,19 +96,20 @@ class DinerController extends Controller
             'address' => 'required|string|min:5',
         ]);
 
-        $comensale->update($validated);
+        $diner->update($validated);
 
-        return redirect()->route('comensales.index')->with('success', 'Diner updated successfully');
+        return redirect()->route('diners.index')->with('success', 'Diner updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Diner $comensale)
+    public function destroy(Diner $diner)
     {
         //
-        $comensale->delete();
+        $diner->delete();
 
-        return redirect()->route('comensales.index')->with('success', 'Diner deleted successfully');
+        return redirect()->route('diners.index')->with('success', 'Diner deleted successfully');
     }
+
 }

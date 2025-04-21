@@ -52,7 +52,7 @@ const props = defineProps<{
 
 // Breadcrumbs
 const breadcrumbs = [
-    { title: 'Comensales', href: '/comensales' },
+    { title: 'Comensales', href: '/diners' },
 ]
 //Table Headers
 const headers: Array<{
@@ -80,7 +80,7 @@ function edit(id: number) {
     console.log("Edit" + id)
     //Hacer una llamada en axios para el comensal
     axios
-        .get(route('comensales.edit', id))
+        .get(route('diners.edit', id))
         .then((response) => {
             const diner = response.data.diner;
             console.log(diner)
@@ -96,7 +96,7 @@ function edit(id: number) {
 function remove(id: number) {
     console.log("Remove" + id)
     if (confirm('¿Estás seguro de que deseas eliminar este comensal?')) {
-        formData.delete(route('comensales.destroy', id), {
+        formData.delete(route('diners.destroy', id), {
             preserveScroll: true,
             onSuccess: () => {
                 console.log('Comensal eliminado con éxito');
@@ -126,7 +126,7 @@ function save() {
             if (isEditing.value && formData.id) {
                 console.log('Updating record:', formData);
                 // Add logic to update the record
-                formData.put(route('comensales.update', formData.id), {
+                formData.put(route('diners.update', formData.id), {
                     preserveScroll: true,
                     onSuccess: () => {
                         dialog.value = false
@@ -140,7 +140,7 @@ function save() {
             } else {
                 console.log('Creating new record:', formData);
                 // Add logic to create a new record
-                formData.post(route('comensales.store'), {
+                formData.post(route('diners.store'), {
                     preserveScroll: true,
                     onSuccess: () => {
                         dialog.value = false

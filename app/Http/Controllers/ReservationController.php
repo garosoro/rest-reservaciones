@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReservationResource;
+use App\Models\Diner;
 use App\Models\Reservation;
+use App\Models\Table;
+use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,8 +18,10 @@ class ReservationController extends Controller
     public function index()
     {
         //
+        $reservations = Reservation::orderBy('created_at', 'desc')
+            ->get();
         return Inertia::render('reservas/index', [
-            'diners' => Reservation::all(),
+            'reservations' => ReservationResource::collection($reservations),
         ]);
     }
 
@@ -33,6 +39,27 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         //
+        try {
+            //Validacion de la tabla
+            $validated = $request->validate([
+                'date' => 'required|date|after_or_equal:today',
+                'time' => 'required|date_format:H:i',
+                'number_of_people' => 'required|integer|min:1|max:20',
+                'diner_id' => 'required|exists:diners,id',
+                'table_id' => 'required|exists:tables,id',
+            ]);
+
+            // dd($validated);
+            Reservation::create($validated);
+
+            Table::where('id', $validated['table_id'])
+                ->update(['status' => 'reserved']);
+
+            return redirect()->route('reservations.index')->with('success', 'Diner created successfully');
+        } catch (Exception $e) {
+            // dd($e);
+            return redirect()->route('reservations.index')->with('error', 'Error creating table');
+        }
     }
 
     /**
@@ -49,6 +76,18 @@ class ReservationController extends Controller
     public function edit(Reservation $reservation)
     {
         //
+        try {
+            // Return only the specific diner data for partial reload
+            return response()->json([
+                'success' => true,
+                'diner' => $reservation,
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener el comensal',
+            ], 500);
+        }
     }
 
     /**
@@ -57,6 +96,16 @@ class ReservationController extends Controller
     public function update(Request $request, Reservation $reservation)
     {
         //
+        $validated = $request->validate([
+            'name' => 'required|string|min:3',
+            'email' => 'required|email',
+            'telephone' => 'required|digits:9',
+            'address' => 'required|string|min:5',
+        ]);
+
+        $reservation->update($validated);
+
+        return redirect()->route('reservations.index')->with('success', 'Diner updated successfully');
     }
 
     /**
@@ -65,5 +114,10 @@ class ReservationController extends Controller
     public function destroy(Reservation $reservation)
     {
         //
+        $reservation->delete();
+
+        $reservation->table()->update(['status' => 'available']);
+
+        return redirect()->route('reservations.index')->with('success', 'Diner deleted successfully');
     }
 }
