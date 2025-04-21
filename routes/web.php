@@ -23,4 +23,4 @@ Route::resource('diners', DinerController::class);
 Route::resource('tables', TableController::class);
 Route::resource('reservations', ReservationController::class);
 Route::get('search', [SearchController::class, 'search'])->name('reservations.search');
-Route::get('/tablesAvailabes', [SearchController::class, 'tablesAvailables'])->name('tables.availables');
+Route::get('tablesAvailabes', [SearchController::class, 'tablesAvailables'])->name('tables.availables');
