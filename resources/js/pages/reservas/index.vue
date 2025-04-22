@@ -7,7 +7,7 @@ import axios from 'axios';
 
 onMounted(() => {
     // Fetch initial data for diners and tables
-    fetchTables();
+    // fetchTables();
 });
 
 const dialog = shallowRef(false)
@@ -51,7 +51,7 @@ const rules = {
 };
 
 // Props
-const props = defineProps<{
+defineProps<{
     reservations: {
         data: Array<Reservation>;
     };
@@ -99,7 +99,7 @@ function add() {
 }
 
 // Function to edit a reservation
-function edit(id: number) {
+/* function edit(id: number) {
     isEditing.value = true
     dialog.value = true
     console.log("Edit" + id)
@@ -116,7 +116,7 @@ function edit(id: number) {
             console.error('Error fetching reservation data:', error);
         });
     console.log(formData)
-}
+} */
 
 // Function to delete a reservation
 function remove(id: number) {
@@ -200,7 +200,7 @@ function fetchDiners(search: string | null = '') {
 
     loadingDiners.value = true; // Set loading state
     axios
-        .get(route('reservations.search', { query: search })) // Replace with your backend route
+        .get(route('reservations.diners.search', { query: search })) // Replace with your backend route
         .then((response) => {
             console.log('Diners:', response.data.diners);
             diners.value = response.data.diners.map((diner: { id: number; name: string }) => ({
@@ -216,15 +216,18 @@ function fetchDiners(search: string | null = '') {
             loadingDiners.value = false; // Reset loading state
         });
 }
+
 //Lista de mesas
 const tables = ref<{ text: string; value: number }[]>([]);
 function fetchTables() {
     axios
-        .get(route('tables.availables')) // Replace with your backend route
+        .get(route('reservations.tables.availables')) // Replace with your backend route
         .then((response) => {
             console.log('Tables:', response.data.tables);
-            tables.value = response.data.tables.map((table: { id: number; number: string }) => ({
-                text: table.number,
+            tables.value = response.data.tables.map((table: {
+                capacity: string; id: number; number: string
+            }) => ({
+                text: table.number + ' (' + table.capacity + ' ' + 'personas)',
                 value: table.id,
             }));
             console.log('Diners loaded successfully:', tables.value);
@@ -279,11 +282,11 @@ function fetchTables() {
                         <v-number-input v-model="formData.number_of_people" :reverse="false" controlVariant="split"
                             label="Número de Personas" :rules="rules.number_of_people" :hideInput="false"
                             :inset="false"></v-number-input>
-                        <v-autocomplete v-model="formData.diner_id" label="Comensal" :rules="rules.diner_id"
-                            :items="diners" :loading="loadingDiners" @update:search="fetchDiners" item-title="text"
-                            item-value="value" />
+                        <v-autocomplete v-model="formData.diner_id" label="Comensal (Minimo 3 carácteres)"
+                            :rules="rules.diner_id" :items="diners" :loading="loadingDiners"
+                            @update:search="fetchDiners" item-title="text" item-value="value" />
                         <v-autocomplete v-model="formData.table_id" label="Mesa" :rules="rules.table_id" :items="tables"
-                            item-title="text" item-value="value" />
+                            @update:focused="fetchTables" item-title="text" item-value="value" />
                     </template>
 
                     <v-divider></v-divider>

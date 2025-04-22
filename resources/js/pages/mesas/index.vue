@@ -30,7 +30,7 @@ const rules = {
 };
 
 //props
-const props = defineProps<{
+defineProps<{
     tables: {
         data: Array<Table>;
     };

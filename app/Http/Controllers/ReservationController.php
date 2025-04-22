@@ -120,4 +120,53 @@ class ReservationController extends Controller
 
         return redirect()->route('reservations.index')->with('success', 'Diner deleted successfully');
     }
+
+    /**
+     * Get all available tables.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * This method retrieves all tables with the status "available" from the database.
+     * The tables are ordered by their creation date in descending order and only the
+     * `id` and `number` fields are selected. The data is returned as a JSON response.
+     *
+     * Example Response:
+     * {
+     *     "tables": [
+     *         { "id": 1, "number": "M01" },
+     *         { "id": 2, "number": "M02" }
+     *     ]
+     * }
+     */
+    public function tablesAvailables(Request $request)
+    {
+        //Traer todas las mesas disponibles
+        $tables = Table::where('status', '=', "available")
+            ->orderBy('created_at', 'DESC')
+            ->get(['id', 'number', 'capacity']);
+        return response()->json(['tables' => $tables]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('query', '');
+        $diners = Diner::where('name', 'like', "%{$query}%")
+            ->whereDoesntHave('reservations')
+            ->take(10)
+            ->orderBy('created_at', 'DESC')
+            ->get(['id', 'name']);
+
+        return response()->json(['diners' => $diners]);
+    }
+
+    public function activeReservations()
+    {
+        $reservations = Reservation::where('status', 'pending')->count();
+
+        return response()->json([
+            'success' => true,
+            'count' => $reservations,
+        ]);
+    }
 }
