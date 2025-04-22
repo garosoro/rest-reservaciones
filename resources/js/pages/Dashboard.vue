@@ -17,6 +17,15 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const gradients = [
+    ['#222'],
+    ['#42b3f4'],
+    ['red', 'orange', 'yellow'],
+    ['purple', 'violet'],
+    ['#00c6ff', '#F0F', '#FF0'],
+    ['#f72047', '#ffd200', '#1feaea'],
+]
+
 const tablesAvailables = ref(0);
 const activeReservations = ref(0);
 
@@ -119,9 +128,10 @@ function formatDate(dateString: string): string {
             <div class="grid auto-rows-min gap-4">
                 <v-card class="mx-auto w-full text-center" color="green" dark>
                     <v-card-text>
-                        <v-sheet color="rgba(0, 0, 0, 1)">
-                            <v-sparkline :auto-draw="true" :auto-draw-duration="80" :model-value="chartLast7Data"
-                                color="rgba(255, 255, 255, .7)" height="100" padding="24" stroke-linecap="round" smooth>
+                        <v-sheet color="#97f4b76e">
+                            <v-sparkline gradient-direction="top" :gradient="gradients[5]" label-size="5"
+                                :auto-draw="true" :auto-draw-duration="80" :model-value="chartLast7Data"
+                                color="rgba(0, 0, 0, 1)" height="100" padding="24" stroke-linecap="round" smooth>
                                 <template v-slot:label="{ index, value }">
                                     {{ chartLast7Data[index].label }}: {{ value }}
                                 </template>
@@ -135,9 +145,10 @@ function formatDate(dateString: string): string {
                 </v-card>
                 <v-card class="mx-auto w-full text-center" color="green" dark>
                     <v-card-text>
-                        <v-sheet color="rgba(0, 0, 0, 1)">
-                            <v-sparkline :model-value="chartNext7Data" color="rgba(255, 255, 255, .7)" height="100"
-                                padding="24" stroke-linecap="round" smooth>
+                        <v-sheet color="#97f4b76e">
+                            <v-sparkline :model-value="chartNext7Data" color="rgba(0, 0, 0, 1)" gradient-direction="top"
+                                :gradient="gradients[5]" label-size="5" height="100" padding="24"
+                                stroke-linecap="round">
                                 <template v-slot:label="{ index, value }">
                                     {{ chartNext7Data[index].label }}: {{ value }}
                                 </template>
