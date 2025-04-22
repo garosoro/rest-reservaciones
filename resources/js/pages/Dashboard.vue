@@ -7,6 +7,7 @@ import { onMounted } from 'vue';
 import axios from 'axios';
 import { ref } from 'vue';
 
+const chartData = ref([1, 5, 7, 2, 4, 7, 1])
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -69,6 +70,22 @@ function getCountActiveReservations() {
                     <v-col class="text-[24px] font-bold" cols="6">
                         {{ activeReservations }}
                     </v-col>
+                </v-card>
+            </div>
+            <div class="relative min-h-[100vh] flex-1 rounded-xl dark:border-sidebar-border md:min-h-min">
+                <v-card class="text-center" color="green" max-width="600" dark>
+                    <v-card-text>
+                        <v-sheet color="rgba(0, 0, 0, 1)">
+                            <v-sparkline :model-value="chartData" color="rgba(255, 255, 255, .7)" height="100"
+                                padding="24" stroke-linecap="round" smooth>
+                                <template v-slot:label="item"> {{ item.value }} </template>
+                            </v-sparkline>
+                        </v-sheet>
+                    </v-card-text>
+
+                    <v-card-text>
+                        <div class="text-h4 font-weight-thin">Reservas últimos Dias</div>
+                    </v-card-text>
                 </v-card>
             </div>
         </div>
