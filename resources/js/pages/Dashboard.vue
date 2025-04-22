@@ -2,12 +2,14 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '../components/PlaceholderPattern.vue';
 import { onMounted } from 'vue';
 import axios from 'axios';
 import { ref } from 'vue';
 
-const chartData = ref([1, 5, 7, 2, 4, 7, 1])
+const chartNext7Data = ref<{ value: number; label: string }[]>([])
+
+const chartLast7Data = ref<{ value: number; label: string }[]>([])
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -21,6 +23,8 @@ const activeReservations = ref(0);
 onMounted(() => {
     getCountTablesAvailables();
     getCountActiveReservations();
+    getLast7DaysReservations();
+    getNext7DaysReservations();
 });
 
 function getCountTablesAvailables() {
@@ -51,6 +55,46 @@ function getCountActiveReservations() {
             }
         });
 }
+function getLast7DaysReservations() {
+    axios.get(route('search.last7days'))
+        .then((response) => {
+            console.log('Available tables:', response.data);
+            chartLast7Data.value = response.data.data.map((item: { date: string; count: number }) => ({
+                value: item.count,
+                label: formatDate(item.date),
+            }));
+            console.log('chartLast7Data', chartLast7Data.value);
+        })
+        .catch((error) => {
+            console.error('Error fetching available tables:', error);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+            }
+        });
+}
+function getNext7DaysReservations() {
+    axios.get(route('search.next7days'))
+        .then((response) => {
+            console.log('Available tables:', response.data);
+            chartNext7Data.value = response.data.data.map((item: { date: string; count: number }) => ({
+                value: item.count,
+                label: formatDate(item.date),
+            }));
+            console.log('chartNext7Data', chartNext7Data.value);
+        })
+        .catch((error) => {
+            console.error('Error fetching available tables:', error);
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+            }
+        });
+}
+function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('es-ES').format(date); // 'en-GB' formats as dd-mm-yyyy
+}
 </script>
 
 <template>
@@ -72,19 +116,37 @@ function getCountActiveReservations() {
                     </v-col>
                 </v-card>
             </div>
-            <div class="relative min-h-[100vh] flex-1 rounded-xl dark:border-sidebar-border md:min-h-min">
-                <v-card class="text-center" color="green" max-width="600" dark>
+            <div class="grid auto-rows-min gap-4">
+                <v-card class="mx-auto w-full text-center" color="green" dark>
                     <v-card-text>
                         <v-sheet color="rgba(0, 0, 0, 1)">
-                            <v-sparkline :model-value="chartData" color="rgba(255, 255, 255, .7)" height="100"
-                                padding="24" stroke-linecap="round" smooth>
-                                <template v-slot:label="item"> {{ item.value }} </template>
+                            <v-sparkline :auto-draw="true" :auto-draw-duration="80" :model-value="chartLast7Data"
+                                color="rgba(255, 255, 255, .7)" height="100" padding="24" stroke-linecap="round" smooth>
+                                <template v-slot:label="{ index, value }">
+                                    {{ chartLast7Data[index].label }}: {{ value }}
+                                </template>
                             </v-sparkline>
                         </v-sheet>
                     </v-card-text>
 
                     <v-card-text>
-                        <div class="text-h4 font-weight-thin">Reservas últimos Dias</div>
+                        <div class="text-h4 font-weight-thin">Reservas de 7 días anteriores</div>
+                    </v-card-text>
+                </v-card>
+                <v-card class="mx-auto w-full text-center" color="green" dark>
+                    <v-card-text>
+                        <v-sheet color="rgba(0, 0, 0, 1)">
+                            <v-sparkline :model-value="chartNext7Data" color="rgba(255, 255, 255, .7)" height="100"
+                                padding="24" stroke-linecap="round" smooth>
+                                <template v-slot:label="{ index, value }">
+                                    {{ chartNext7Data[index].label }}: {{ value }}
+                                </template>
+                            </v-sparkline>
+                        </v-sheet>
+                    </v-card-text>
+
+                    <v-card-text>
+                        <div class="text-h4 font-weight-thin">Reservas de los proximos 7 días</div>
                     </v-card-text>
                 </v-card>
             </div>

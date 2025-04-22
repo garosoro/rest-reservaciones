@@ -44,4 +44,6 @@ Route::get('reservation/tables/availables', [ReservationController::class, 'tabl
 Route::get('reservation/diners/search', [ReservationController::class, 'search'])->name('reservations.diners.search');
 Route::get('reservation/actives', [ReservationController::class, 'activeReservations'])->name('reservations.active');
 
+Route::get('search/last7days', [SearchController::class, 'reservationsLast7Days'])->name('search.last7days');
+Route::get('search/next7days', [SearchController::class, 'reservationsNext7Days'])->name('search.next7days');
 Route::get('search/tables/available', [SearchController::class, 'available'])->name('search.available');
